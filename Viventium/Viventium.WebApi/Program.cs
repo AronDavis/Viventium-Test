@@ -34,12 +34,12 @@ namespace Viventium.WebApi
 
             app.MapControllers();
 
-            _createDbIfNotExists(app);
+            _recreateDb(app);
 
             app.Run();
         }
 
-        private static void _createDbIfNotExists(WebApplication app)
+        private static void _recreateDb(WebApplication app)
         {
             using (IServiceScope scope = app.Services.CreateScope())
             {
