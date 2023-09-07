@@ -23,6 +23,7 @@ namespace Viventium.WebApi.Controllers
         [HttpPost]
         public async Task<string> Post()
         {
+            //check content type
             if(!Request.HasFormContentType)
             {
                 return "Request does not have form content type.";
@@ -34,7 +35,7 @@ namespace Viventium.WebApi.Controllers
                 return "There should be exactly one CSV file attached.";
             }
 
-            //delete tables
+            //delete existing data in tables
             await _viventiumContext.Companies.ExecuteDeleteAsync();
             await _viventiumContext.Employees.ExecuteDeleteAsync();
 
@@ -47,23 +48,32 @@ namespace Viventium.WebApi.Controllers
                 //skip column names
                 csvParser.ReadLine();
 
+                //track IDs to avoid duplicate data
                 HashSet<int> companyIds = new HashSet<int>();
                 HashSet<string> employeeNumbers = new HashSet<string>();
 
+                //track current line of CSV for error response
                 int currentLine = 1;
+
+                //loop through data
                 while (!csvParser.EndOfData)
                 {
+                    //get fields on current line
                     string[]? fields = csvParser.ReadFields();
+
+                    //if no fields
                     if (fields == null)
                     {
                         return $"Line {currentLine} was empty";
                     }
 
+                    //if incorrent number of fields
                     if(fields.Length != 10)
                     {
                         return $"Line {currentLine} had the incorrect number of fields.";
                     }
 
+                    //try to get companyId as int
                     if(!int.TryParse(fields[0], out int companyId))
                     {
                         return $"Line {currentLine} had an incorrect Company ID.";
@@ -89,6 +99,7 @@ namespace Viventium.WebApi.Controllers
 
                     string employeeNumber = fields[3];
 
+                    //if the employee has not been added yet
                     if (!employeeNumbers.Contains(employeeNumber))
                     {
                         string employeeFirstName = fields[4];
@@ -96,7 +107,7 @@ namespace Viventium.WebApi.Controllers
                         string employeeEmail = fields[6];
                         string employeeDepartment = fields[7];
 
-
+                        //try to get the hire date
                         if(!_tryGetNullable(fields[8], out DateTime? employeeHireDate))
                         {
                             return $"Line {currentLine} had an incorrect Hire Date.";
@@ -104,6 +115,7 @@ namespace Viventium.WebApi.Controllers
 
                         string? employeeManagerEmployeeNumber = fields[9];
 
+                        //if the ManagerEmployeeNumber is empty, set it to null so the database is happier
                         if (employeeManagerEmployeeNumber == string.Empty)
                         {
                             employeeManagerEmployeeNumber = null;
@@ -128,6 +140,7 @@ namespace Viventium.WebApi.Controllers
                 }
             }
 
+            //save database changes
             _viventiumContext.SaveChanges();
             return "success";
         }
