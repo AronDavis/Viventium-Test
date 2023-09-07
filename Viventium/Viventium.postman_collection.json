@@ -1,0 +1,38 @@
+{
+	"info": {
+		"_postman_id": "ac38cfb0-1449-4c96-9c18-e8b34a479515",
+		"name": "Viventium",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "679779"
+	},
+	"item": [
+		{
+			"name": "DataStore",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "csvFile",
+							"type": "file"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:5013/DataStore",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5013",
+					"path": [
+						"DataStore"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
